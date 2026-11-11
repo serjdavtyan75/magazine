@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f2f5f5">
+<title>Магазин: наличие и заказы</title>
+<style>
+:root{--bg:#f2f5f5;--sf:#fff;--ln:#e1e8e8;--ac:#5f9490;--acs:#e3eeed;--tx:#28373a;--mu:#7c8d90;--rose:#c47a7a;--rs:#f6e7e7;--wn:#a08440;--ws:#f3ecda;--e:cubic-bezier(.2,.8,.2,1);color-scheme:light}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#162022;--sf:#1e2b2d;--ln:#2d3d40;--ac:#7fb5b0;--acs:#263a3a;--tx:#e3ecec;--mu:#8fa3a6;--rose:#d99a9a;--rs:#3a2a2c;--wn:#d1b676;--ws:#3a3524;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#162022;--sf:#1e2b2d;--ln:#2d3d40;--ac:#7fb5b0;--acs:#263a3a;--tx:#e3ecec;--mu:#8fa3a6;--rose:#d99a9a;--rs:#3a2a2c;--wn:#d1b676;--ws:#3a3524;color-scheme:dark}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit;margin:0}
+body{background:var(--bg);color:var(--tx);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+button,input{font:inherit;color:inherit}
+#app{max-width:720px;margin:0 auto;padding:18px 16px 96px}
+.hd{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px}
+h1{font-size:23px;font-weight:600}
+.sub{color:var(--mu);font-size:13px;margin-top:2px}
+.btn{border:0;background:var(--ac);color:var(--bg);padding:10px 16px;border-radius:12px;cursor:pointer;transition:transform .2s var(--e)}
+.btn:active{transform:scale(.96)}
+.btn.g{background:var(--acs);color:var(--ac)}
+.sr{position:relative;margin-bottom:12px}
+.sr input{width:100%;border:1px solid var(--ln);background:var(--sf);border-radius:12px;padding:11px 40px 11px 14px}
+.sr input:focus{outline:0;border-color:var(--ac);box-shadow:0 0 0 3px var(--acs)}
+.sr button{position:absolute;right:8px;top:50%;width:28px;height:28px;margin-top:-14px;border:0;border-radius:50%;background:var(--acs);color:var(--ac);font-size:12px;opacity:0;pointer-events:none;transition:opacity .2s}
+.sr button.on{opacity:1;pointer-events:auto}
+.chips{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.chip{border:1px solid var(--ln);background:var(--sf);color:var(--mu);border-radius:20px;padding:6px 14px;font-size:14px;cursor:pointer;transition:.25s var(--e)}
+.chip.on{background:var(--acs);border-color:transparent;color:var(--ac);font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(min-width:560px){.grid{grid-template-columns:repeat(3,1fr)}}
+.card{background:var(--sf);border:1px solid var(--ln);border-radius:16px;overflow:hidden;animation:in .4s var(--e) backwards}
+@keyframes in{from{opacity:0;transform:translateY(10px)}}
+.ph{aspect-ratio:1;background:var(--acs);display:grid;place-items:center;color:var(--ac);font-size:30px;overflow:hidden}
+.ph img{width:100%;height:100%;object-fit:cover}
+.cb{padding:10px 12px 12px}
+.nm{font-weight:600;font-size:15px;line-height:1.3;margin-bottom:6px;overflow-wrap:anywhere}
+.row{display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap}
+.pr{font-size:15px}
+.tag{font-size:12px;padding:2px 9px;border-radius:20px;background:var(--acs);color:var(--ac);white-space:nowrap}
+.tag.low{background:var(--ws);color:var(--wn)}
+.tag.zero{background:var(--rs);color:var(--rose)}
+.cl{margin-top:7px;font-size:12px;color:var(--mu)}
+.list{display:flex;flex-direction:column;gap:12px}
+.ord{padding:16px;animation:in .4s var(--e) backwards}
+.ord .t{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.who{font-weight:600;font-size:17px}
+.st{font-size:12px;padding:3px 11px;border-radius:20px;background:var(--ws);color:var(--wn);white-space:nowrap}
+.st.d{background:var(--acs);color:var(--ac)}
+.ord a{color:var(--ac);text-decoration:none}
+.meta{margin-top:4px;color:var(--mu);font-size:14px;overflow-wrap:anywhere}
+.its{margin:12px 0 10px;padding-top:10px;border-top:1px solid var(--ln);display:flex;flex-direction:column;gap:4px;font-size:15px}
+.tot{display:flex;justify-content:space-between;font-weight:600}
+.empty{text-align:center;color:var(--mu);padding:50px 18px;border:1.5px dashed var(--ln);border-radius:16px;animation:in .4s var(--e)}
+.how{background:var(--sf);border:1px solid var(--ln);border-radius:16px;padding:20px;margin:8px 0 18px}
+.how ol{padding-left:20px;display:flex;flex-direction:column;gap:8px;color:var(--mu);margin:12px 0 18px}
+.how ol b{color:var(--tx);font-weight:600}
+.tabs{position:fixed;left:0;right:0;bottom:0;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--sf);border-top:1px solid var(--ln);z-index:5}
+.tin{max-width:420px;margin:0 auto;position:relative;display:grid;grid-template-columns:1fr 1fr;background:var(--bg);border-radius:14px;padding:4px}
+.pill{position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);background:var(--acs);border-radius:11px;transition:transform .4s var(--e)}
+.tin.o .pill{transform:translateX(100%)}
+.tin button{position:relative;border:0;background:none;padding:10px;border-radius:11px;color:var(--mu);cursor:pointer;transition:color .25s}
+.tin button.on{color:var(--tx);font-weight:600}
+.toast{position:fixed;left:50%;bottom:calc(86px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:10px 18px;border-radius:30px;font-size:14px;z-index:20;animation:tst 2.4s var(--e) forwards;white-space:nowrap}
+@keyframes tst{0%{opacity:0;transform:translate(-50%,14px)}12%,85%{opacity:1;transform:translate(-50%,0)}100%{opacity:0}}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition-duration:.01s!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<input type="file" id="file" accept=".json,application/json" hidden>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let D=null,view='p',fp='all',fo='work',q='',mem=null;
+
+/* storage: IndexedDB, falls back to memory */
+const open=()=>new Promise((ok,no)=>{try{const r=indexedDB.open('shop-view',1);r.onupgradeneeded=()=>r.result.createObjectStore('k');r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)}catch(e){no(e)}});
+async function put(v){mem=v;try{const d=await open();await new Promise((ok,no)=>{const t=d.transaction('k','readwrite');t.objectStore('k').put(v,'d');t.oncomplete=ok;t.onerror=()=>no(t.error)})}catch(e){toast('Не удалось сохранить на телефоне')}}
+async function get(){try{const d=await open();return await new Promise((ok,no)=>{const r=d.transaction('k').objectStore('k').get('d');r.onsuccess=()=>ok(r.result||null);r.onerror=()=>no(r.error)})}catch(e){return mem}}
+
+function toast(t){const e=document.createElement('div');e.className='toast';e.textContent=t;document.body.append(e);setTimeout(()=>e.remove(),2400)}
+const money=n=>(+n||0).toLocaleString('ru-RU')+' '+(D.cur||'');
+const fmt=t=>new Date(t).toLocaleString('ru-RU',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'});
+
+function shell(){
+  const wrap=$('#app');
+  if(!D){
+    wrap.innerHTML=`<div class="hd"><div><h1>Мой магазин</h1><div class="sub">Наличие и заказы</div></div></div>
+    <div class="how"><b>Как загрузить данные</b>
+    <ol><li>На компьютере в программе нажмите <b>«Сохранить копию»</b>.</li>
+    <li>Отправьте файл себе на телефон: Telegram, WhatsApp, почта или Google Диск.</li>
+    <li>Здесь нажмите кнопку ниже и выберите этот файл.</li></ol>
+    <button class="btn" id="load">Выбрать файл копии</button></div>`;
+    $('#load').onclick=()=>$('#file').click();return}
+  wrap.innerHTML=`<div class="hd"><div><h1>${view==='p'?'В наличии':'Заказы'}</h1><div class="sub" id="cnt"></div></div>
+    <button class="btn g" id="load">Обновить</button></div><div id="c"></div>
+    <div class="tabs"><div class="tin ${view}"><div class="pill"></div><button data-v="p" class="${view==='p'?'on':''}">Товары</button><button data-v="o" class="${view==='o'?'on':''}">Заказы</button></div></div>`;
+  $('#load').onclick=()=>$('#file').click();
+  document.querySelectorAll('.tin button').forEach(b=>b.onclick=()=>{if(view!==b.dataset.v){view=b.dataset.v;q='';shell()}});
+  content(true);
+}
+
+function content(first){
+  const c=$('#c');
+  if(view==='p'){
+    const t=q.trim().toLowerCase();
+    let L=D.products.filter(p=>(fp==='all'||p.qty>0)&&(!t||(p.name+' '+p.colors.join(' ')).toLowerCase().includes(t)));
+    $('#cnt').textContent=`${D.products.length} товаров · данные от ${fmt(D.at)}`;
+    if(first){c.innerHTML=`<div class="sr"><input id="q" type="search" placeholder="Поиск по названию или цвету" value="${esc(q)}"><button id="qc" class="${q?'on':''}">✕</button></div>
+      <div class="chips"><button class="chip ${fp==='all'?'on':''}" data-f="all">Все</button><button class="chip ${fp==='in'?'on':''}" data-f="in">Только в наличии</button></div><div id="g"></div>`;
+      const i=$('#q');i.oninput=()=>{q=i.value;$('#qc').classList.toggle('on',!!q);content(false)};
+      $('#qc').onclick=()=>{i.value='';q='';$('#qc').classList.remove('on');content(false);i.focus()};
+      c.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{fp=b.dataset.f;c.querySelectorAll('.chip').forEach(x=>x.classList.toggle('on',x===b));content(false)})}
+    $('#g').innerHTML=!D.products.length?`<div class="empty">В копии нет товаров.</div>`:!L.length?`<div class="empty">Ничего не найдено.<br>Попробуйте другой запрос.</div>`:
+      `<div class="grid">${L.map((p,i)=>`<div class="card" style="${first?`animation-delay:${Math.min(i,8)*35}ms`:'animation:none'}"><div class="ph">${p.img?`<img src="${p.img}" alt="">`:'◌'}</div>
+      <div class="cb"><div class="nm">${esc(p.name)}</div><div class="row"><span class="pr">${money(p.price)}</span>
+      <span class="tag ${p.qty<=0?'zero':p.qty<=3?'low':''}">${p.qty<=0?'нет в наличии':p.qty+' шт.'}</span></div>
+      ${p.colors.length?`<div class="cl">${p.colors.map(esc).join(', ')}</div>`:''}</div></div>`).join('')}</div>`;
+  }else{
+    const w=D.orders.filter(o=>!o.done).length,L=D.orders.filter(o=>fo==='all'||!o.done);
+    $('#cnt').textContent=`${w} в работе · ${D.orders.length} всего`;
+    c.innerHTML=`<div class="chips"><button class="chip ${fo==='work'?'on':''}" data-f="work">В работе (${w})</button><button class="chip ${fo==='all'?'on':''}" data-f="all">Все</button></div>
+    ${!L.length?`<div class="empty">${D.orders.length?'Все заказы доставлены.':'Заказов пока нет.'}</div>`:
+    `<div class="list">${L.map((o,i)=>`<div class="card ord" style="animation-delay:${Math.min(i,8)*35}ms"><div class="t"><span class="who">${esc(o.client)}</span><span class="st ${o.done?'d':''}">${o.done?'Доставлен':'В работе'}</span></div>
+    <div class="meta">${o.phone?`<a href="tel:${esc(o.phone.replace(/[^\d+]/g,''))}">${esc(o.phone)}</a><br>`:''}${esc(o.addr)}</div>
+    <div class="its">${o.items.map(it=>`<div>${esc(it.name)}${it.color?`, ${esc(it.color)}`:''} — <b>${it.qty} шт.</b></div>`).join('')}</div>
+    <div class="tot"><span>Итого</span><span>${money(o.items.reduce((s,it)=>s+it.qty*it.price,0))}</span></div></div>`).join('')}</div>`}`;
+    c.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{fo=b.dataset.f;content(false)});
+  }
+}
+
+$('#file').onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const r=new FileReader();
+  r.onload=async()=>{try{const d=JSON.parse(r.result);if(!Array.isArray(d.products)||!Array.isArray(d.orders))throw 0;
+    D={cur:d.cur||'',at:Date.now(),
+      products:d.products.map(p=>({name:p.name||'',img:p.img||'',price:p.price,qty:+p.qty||0,colors:p.colors||[]})),
+      orders:d.orders.map(o=>({client:o.client||'',phone:o.phone||'',addr:o.addr||'',done:!!o.done,items:(o.items||[]).map(i=>({name:i.name,color:i.color,qty:i.qty,price:i.price}))}))};
+    await put(D);shell();toast('Данные обновлены')}catch(x){toast('Этот файл не подходит')}};r.readAsText(f)};
+
+get().then(d=>{D=d;shell()});
+</script>
+</body>
+</html>

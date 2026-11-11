@@ -1,0 +1,2 @@
+# magazine
+android version
